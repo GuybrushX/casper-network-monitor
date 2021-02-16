@@ -2,10 +2,10 @@ import os
 import subprocess
 import json
 import pathlib
-import pickle
 import time
 from collections import defaultdict
 from pathlib import Path
+from pickle_util import load_bz2_pickle, save_bz2_pickle
 
 NODE_ADDRESS = 'http://3.18.112.103:7777'
 CHAIN_NAME = 'delta-10'
@@ -18,6 +18,7 @@ OTHER_NODE_ADDRESSES = ['http://34.220.39.73:7777', ]
 
 SCRIPT_PATH = Path(__file__).parent.absolute()
 DATA_PATH = SCRIPT_PATH / "data"
+
 
 def _subprocess_call(command, expect_text) -> str:
     process = subprocess.Popen(command,
@@ -74,9 +75,9 @@ def get_all_blocks():
 
     will be REALLY slow with large block downloads as calls are throttled.
     """
-    cached_blocks_file = DATA_PATH / "block_cache"
+    cached_blocks_file = DATA_PATH / "block_cache.pbz2"
     if pathlib.Path.exists(cached_blocks_file):
-        blocks = pickle.load(open(cached_blocks_file, "rb"))
+        blocks = load_bz2_pickle(cached_blocks_file)
         last_height = blocks[-1]["header"]["height"]
     else:
         blocks = []
@@ -93,7 +94,7 @@ def get_all_blocks():
 
     new_blocks.reverse()
     blocks.extend(new_blocks)
-    pickle.dump(blocks, open(cached_blocks_file, "wb"))
+    save_bz2_pickle(blocks, cached_blocks_file)
     return blocks
 
 
@@ -103,16 +104,16 @@ def get_all_deploys():
 
     will be REALLY slow with large downloads as calls are throttled.
     """
-    cached_deploys_file = DATA_PATH / "deploy_cache"
+    cached_deploys_file = DATA_PATH / "deploy_cache.pbz2"
     if pathlib.Path.exists(cached_deploys_file):
-        deploys = pickle.load(open(cached_deploys_file, "rb"))
+        deploys = load_bz2_pickle(cached_deploys_file)
     else:
         deploys = {}
     for block in get_all_blocks():
         for deploy_hash in block["header"]["deploy_hashes"]:
             if deploy_hash not in deploys.keys():
                 deploys[deploy_hash] = get_deploy(deploy_hash)
-    pickle.dump(deploys, open(cached_deploys_file, "wb"))
+    save_bz2_pickle(deploys, cached_deploys_file)
     return deploys
 
 # current_global_state_hash = get_global_state_hash()
