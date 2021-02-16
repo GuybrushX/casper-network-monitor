@@ -5,6 +5,7 @@ from pathlib import Path
 from datetime import datetime
 from pickle_util import load_bz2_pickle, save_bz2_pickle
 from network_graph import graph_nodes
+from casper_node_util import cache_all
 
 SCRIPT_DIR = Path(__file__).parent.absolute()
 DATA_FOLDER = SCRIPT_DIR / "data"
@@ -40,3 +41,6 @@ save_bz2_pickle(spider.nodes, LATEST_FILE)
 
 ip_list = graph_nodes(spider.nodes, GRAPH_FILE)
 GRAPH_IPS_LATEST.write_text('\n'.join([f"{ip},{index}" for index, ip in ip_list]))
+
+# Cache blocks and deploys
+cache_all()

@@ -224,6 +224,13 @@ def get_proposer_per_era():
         eras[era][proposer] += 1
     return eras
 
+
+def cache_all():
+    """ This should do what is needed to cache everything """
+    # Loads blocks and deploys
+    get_all_deploys()
+
+
 # save_block_info()
 #get_deploy_hashs_per_block()
 # for block in get_all_blocks():
