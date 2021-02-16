@@ -85,6 +85,7 @@ def get_all_blocks():
     block = get_block()["result"]["block"]
     new_blocks = []
     cur_height = block["header"]["height"]
+    print(f"Downloading from cur height: {cur_height} down to cached height: {last_height}.")
     for _ in range(cur_height - last_height):
         new_blocks.append(block)
         time.sleep(0.1)
@@ -96,6 +97,10 @@ def get_all_blocks():
     blocks.extend(new_blocks)
     save_bz2_pickle(blocks, cached_blocks_file)
     return blocks
+
+
+def get_proposer_per_block():
+    return [(block["header"]["height"], block["header"]["proposer"]) for block in get_all_blocks()]
 
 
 def get_all_deploys():
@@ -278,25 +283,25 @@ def cache_all():
 # for node in CL_NODE_ADDRESSES:
 #     deploy_saved_deploy_to_node(node, '~/repos/casper-node/do_nothing_deploy')
 
-# def get_weight_differences():
-#     key_weight = get_auction_era_key_weight(get_last_auction_era(NODE_ADDRESS))
-#     max_weight = max([v[1] for v in key_weight])
-#     return [(v[0], max_weight - v[1]) for v in key_weight]
-#
-#
-# def balance_by_delegation():
-#     for pub_key, to_delegate in get_weight_differences():
-#         if to_delegate == 0:
-#             continue
-#         command = ["casper-client", "put-deploy",
-#                    "--chain-name", "delta-10",
-#                    "--node-address", NODE_ADDRESS,
-#                    "--secret-key", "/home/sacherjj/aws/keys/joe/secret_key.pem",
-#                    "--session-path", "/home/sacherjj/repos/casper-node/target/wasm32-unknown-unknown/release/delegate.wasm",
-#                    "--payment-amount", "1000000000",
-#                    "--session-arg", f"\"validator:public_key='{pub_key}'\"",
-#                    "--session-arg", f"\"amount:u512='{to_delegate}'\"",
-#                    "--session-arg", "\"delegator:public_key='0186d42bacf67a4b6c5042edba6bc736769171ca3320f7b0040ab9265aca13bbee'\""]
-#         print(' '.join(command))
+def get_weight_differences():
+    key_weight = get_auction_era_key_weight(get_last_auction_era(NODE_ADDRESS))
+    max_weight = max([v[1] for v in key_weight])
+    return [(v[0], max_weight - v[1]) for v in key_weight]
+
+
+def balance_by_delegation():
+    for pub_key, to_delegate in get_weight_differences():
+        if to_delegate == 0:
+            continue
+        command = ["casper-client", "put-deploy",
+                   "--chain-name", "delta-10",
+                   "--node-address", NODE_ADDRESS,
+                   "--secret-key", "/home/sacherjj/aws/keys/joe/secret_key.pem",
+                   "--session-path", "/home/sacherjj/repos/casper-node/target/wasm32-unknown-unknown/release/delegate.wasm",
+                   "--payment-amount", "1000000000",
+                   "--session-arg", f"\"validator:public_key='{pub_key}'\"",
+                   "--session-arg", f"\"amount:u512='{to_delegate}'\"",
+                   "--session-arg", "\"delegator:public_key='0186d42bacf67a4b6c5042edba6bc736769171ca3320f7b0040ab9265aca13bbee'\""]
+        print(' '.join(command))
 #
 # balance_by_delegation()
