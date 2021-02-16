@@ -7,7 +7,7 @@ DATA_DIR = SCRIPT_DIR / "data"
 GEO_DATA = DATA_DIR / "geo_data.pbz2"
 ACCESS_KEY_FILE = SCRIPT_DIR / "ipstack_access_key"
 
-ACCESS_KEY = ACCESS_KEY_FILE.read_text()
+ACCESS_KEY = ACCESS_KEY_FILE.read_text().strip()
 
 
 def geo_data_for_ip(ip) -> dict:
