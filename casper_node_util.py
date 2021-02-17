@@ -92,7 +92,7 @@ def get_all_blocks():
     block = get_block()["result"]["block"]
     new_blocks = []
     cur_height = block["header"]["height"]
-    print(f"Downloading from cur height: {cur_height} down to cached height: {last_height}.")
+    print(f"Downloading blocks from cur height: {cur_height} down to cached height: {last_height}.")
     for _ in range(cur_height - last_height):
         new_blocks.append(block)
         time.sleep(0.1)
@@ -137,6 +137,14 @@ def get_all_deploys():
     deploys["last_height"] = cur_height
     save_bz2_pickle(deploys, cached_deploys_file)
     return deploys
+
+
+def get_deploys_by_public_key(public_key):
+    for deploy in get_all_deploys().values():
+        if isinstance(deploy, int):
+            continue
+        if deploy["result"]["deploy"]["header"]["account"] == public_key:
+            print(deploy)
 
 
 def get_all_era_info():
