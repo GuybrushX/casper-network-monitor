@@ -1,7 +1,6 @@
 import os
 import subprocess
 import json
-import pathlib
 import time
 from collections import defaultdict
 from pathlib import Path
@@ -69,6 +68,14 @@ def get_block(block_hash=None):
     return _subprocess_call_with_json(command, "block")
 
 
+def get_era_info_by_switch_block(block_identifier):
+    """ This will return null for 'era_summary' unless given a switch_block hash, which is the last block of an era. """
+    command = ["casper-client", "get-era-info-by-switch-block",
+               "--node-address", NODE_ADDRESS,
+               "--block-identifier", block_identifier]
+    return _subprocess_call_with_json(command, "era_summary")
+
+
 def get_all_blocks():
     """
     retrieves all blocks on chain and caches when possible
@@ -76,7 +83,7 @@ def get_all_blocks():
     will be REALLY slow with large block downloads as calls are throttled.
     """
     cached_blocks_file = DATA_PATH / "block_cache.pbz2"
-    if pathlib.Path.exists(cached_blocks_file):
+    if Path.exists(cached_blocks_file):
         blocks = load_bz2_pickle(cached_blocks_file)
         last_height = blocks[-1]["header"]["height"]
     else:
@@ -108,25 +115,50 @@ def get_all_deploys():
     retrieves all deploys on chain and caches
 
     will be REALLY slow with large downloads as calls are throttled.
+
+    Key "last_height" stores last_height of block deploys have been sync up to.
     """
     cached_deploys_file = DATA_PATH / "deploy_cache.pbz2"
-    if pathlib.Path.exists(cached_deploys_file):
+    if Path.exists(cached_deploys_file):
         deploys = load_bz2_pickle(cached_deploys_file)
     else:
         deploys = {}
-    for block in get_all_blocks():
+    cur_height = 0
+    cache_height = deploys.get("last_height", 0)
+    blocks = get_all_blocks()
+    print(f"Downloading deploys from block height {cache_height} to {blocks[-1]['header']['height']}")
+    for block in blocks[cache_height - 1:]:
+        cur_height = block["header"]["height"]
+        if cur_height < cache_height:
+            continue
         for deploy_hash in block["header"]["deploy_hashes"]:
             if deploy_hash not in deploys.keys():
                 deploys[deploy_hash] = get_deploy(deploy_hash)
+    deploys["last_height"] = cur_height
     save_bz2_pickle(deploys, cached_deploys_file)
     return deploys
 
-# current_global_state_hash = get_global_state_hash()
-# print(get_era_validators(current_global_state_hash))
-# all_blocks = get_all_blocks()
 
-
-#
+def get_all_era_info():
+    cached_era_info_file = DATA_PATH / "era_info.pbz2"
+    if Path.exists(cached_era_info_file):
+        era_info = load_bz2_pickle(cached_era_info_file)
+        last_era = max(era_info.keys())
+    else:
+        era_info = {}
+        last_era = -1
+    blocks = get_all_blocks()
+    print(f"Downloading era data from {last_era} to {blocks[-1]['header']['era_id']}")
+    last_block_hash = blocks[0]["hash"]
+    for block in blocks:
+        cur_era = block["header"]["era_id"]
+        if last_era < cur_era:
+            last_era = cur_era
+            era_info_by_switch = get_era_info_by_switch_block(last_block_hash)
+            era_info[cur_era] = era_info_by_switch["result"]["era_summary"]
+        last_block_hash = block["hash"]
+    save_bz2_pickle(era_info, cached_era_info_file)
+    return era_info
 
 
 def unique_state_root_hashes(blocks):
@@ -148,24 +180,6 @@ def state_root_hash_by_era():
             yield era_id, block["header"]["state_root_hash"]
 
 
-# def filtered_era_validators():
-#     cached_eras_file = pathlib.Path(os.path.realpath(__file__)).parent / "era_validator_cache"
-#     if pathlib.Path.exists(cached_eras_file):
-#         eras = pickle.load(open(cached_eras_file, "rb"))
-#     else:
-#         eras = []
-#     pre_eras = [era[0] for era in eras]
-#     for era_id, srh in state_root_hash_by_era(get_all_blocks()):
-#         if era_id in pre_eras:
-#             continue
-#         era_val = get_era_validators(srh)
-#         for era in era_val:
-#             if era not in eras:
-#                 eras.append(era)
-#     pickle.dump(eras, open(cached_eras_file, "wb"))
-#     return eras
-
-
 def all_validator_keys(era_validators):
     all_keys = set()
     for era in era_validators:
@@ -184,7 +198,7 @@ def save_validator_by_key(era_validators):
         keys_in_era = {val[0]: val[1] for val in cur_vals}
         for key in all_keys:
             validators[key] += [keys_in_era.get(key, 0)]
-    valid_by_era_path = pathlib.Path(os.path.realpath(__file__)).parent / "validators_by_era.csv"
+    valid_by_era_path = Path(os.path.realpath(__file__)).parent / "validators_by_era.csv"
     with open(valid_by_era_path, "w+") as f:
         f.write(f"era_id,bonded_validator_count,{','.join(all_keys)}\n")
         for era_id in range(len(era_validators)):
@@ -234,74 +248,6 @@ def cache_all():
     """ This should do what is needed to cache everything """
     # Loads blocks and deploys
     get_all_deploys()
+    # Uses blocks to load era_info
+    get_all_era_info()
 
-
-# save_block_info()
-#get_deploy_hashs_per_block()
-# for block in get_all_blocks():
-#     # print(block)
-#     header = block["header"]
-#     deploy_count = len(header['deploy_hashes'])
-#     for deploy in header['deploy_hashes']:
-#         deploy_obj = get_deploy(deploy)
-#         print(deploy_obj)
-#     transfer_count = len(header['transfer_hashes'])
-#     if deploy_count > 2 or transfer_count > 2:
-#         print(f"{header['era_id']}-{header['height']} {deploy_count} {transfer_count}")
-
-
-# for deploy in get_all_deploys():
-#     print(deploy)
-#
-# era_proposers = get_proposer_per_era()
-# print(era_proposers)
-# for era_id, era in enumerate(era_proposers):
-#     print(era_id, list(era.values()))
-# for deploy_hash, deploy in get_all_deploys().items():
-#     execution_results = deploy["result"]["execution_results"]
-#     if not execution_results:
-#         print(f"{deploy_hash} - No execution results.")
-#         continue
-#     for results in execution_results:
-#         if 'Failure' in results["result"].keys():
-#             print(results)
-
-
-# era_validators = filtered_era_validators(all_blocks)
-# save_validator_by_key(era_validators)
-
-# state_root_hash_by_era(all_blocks)
-
-# print(get_era_validators(all_blocks[-1]["header"]["state_root_hash"]))
-
-#
-# for i in range(10):
-#     for node in CL_NODE_ADDRESSES:
-#          deploy_do_nothing_to_node(node)
-#     time.sleep(65.5)
-
-# for node in CL_NODE_ADDRESSES:
-#     deploy_saved_deploy_to_node(node, '~/repos/casper-node/do_nothing_deploy')
-
-def get_weight_differences():
-    key_weight = get_auction_era_key_weight(get_last_auction_era(NODE_ADDRESS))
-    max_weight = max([v[1] for v in key_weight])
-    return [(v[0], max_weight - v[1]) for v in key_weight]
-
-
-def balance_by_delegation():
-    for pub_key, to_delegate in get_weight_differences():
-        if to_delegate == 0:
-            continue
-        command = ["casper-client", "put-deploy",
-                   "--chain-name", "delta-10",
-                   "--node-address", NODE_ADDRESS,
-                   "--secret-key", "/home/sacherjj/aws/keys/joe/secret_key.pem",
-                   "--session-path", "/home/sacherjj/repos/casper-node/target/wasm32-unknown-unknown/release/delegate.wasm",
-                   "--payment-amount", "1000000000",
-                   "--session-arg", f"\"validator:public_key='{pub_key}'\"",
-                   "--session-arg", f"\"amount:u512='{to_delegate}'\"",
-                   "--session-arg", "\"delegator:public_key='0186d42bacf67a4b6c5042edba6bc736769171ca3320f7b0040ab9265aca13bbee'\""]
-        print(' '.join(command))
-#
-# balance_by_delegation()
