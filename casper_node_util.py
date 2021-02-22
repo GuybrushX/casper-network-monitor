@@ -127,7 +127,7 @@ def get_all_deploys():
     cache_height = deploys.get("last_height", 0)
     blocks = get_all_blocks()
     print(f"Downloading deploys from block height {cache_height} to {blocks[-1]['header']['height']}")
-    for block in blocks[cache_height - 1:]:
+    for block in blocks[cache_height:]:
         cur_height = block["header"]["height"]
         if cur_height < cache_height:
             continue
@@ -137,6 +137,35 @@ def get_all_deploys():
     deploys["last_height"] = cur_height
     save_bz2_pickle(deploys, cached_deploys_file)
     return deploys
+
+
+def get_all_transfers():
+    """
+    retrieves all transfers on chain and caches
+
+    will be REALLY slow with large downloads as calls are throttled.
+
+    Key "last_height" stores last_height of block deploys have been sync up to.
+    """
+    cached_transfers_file = DATA_PATH / "transfer_cache.pbz2"
+    if Path.exists(cached_transfers_file):
+        transfers = load_bz2_pickle(cached_transfers_file)
+    else:
+        transfers = {}
+    cur_height = 0
+    cache_height = transfers.get("last_height", 0)
+    blocks = get_all_blocks()
+    print(f"Downloading transfers from block height {cache_height} to {blocks[-1]['header']['height']}")
+    for block in blocks[cache_height:]:
+        cur_height = block["header"]["height"]
+        if cur_height < cache_height:
+            continue
+        for transfer_hash in block["header"]["transfer_hashes"]:
+            if transfer_hash not in transfers.keys():
+                transfers[transfer_hash] = get_deploy(transfer_hash)
+    transfers["last_height"] = cur_height
+    save_bz2_pickle(transfers, cached_transfers_file)
+    return transfers
 
 
 def get_deploys_by_public_key(public_key):
@@ -256,6 +285,8 @@ def cache_all():
     """ This should do what is needed to cache everything """
     # Loads blocks and deploys
     get_all_deploys()
+    # Loads transfers
+    get_all_transfers()
     # Uses blocks to load era_info
     get_all_era_info()
 
