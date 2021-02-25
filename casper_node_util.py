@@ -82,7 +82,7 @@ def get_all_blocks():
 
     will be REALLY slow with large block downloads as calls are throttled.
     """
-    ANNOUNCE_INTERVAL = 500
+    ANNOUNCE_INTERVAL = 100
 
     cached_blocks_file = DATA_PATH / "block_cache.pbz2"
     if Path.exists(cached_blocks_file):
@@ -123,7 +123,7 @@ def get_all_deploys():
 
     Key "last_height" stores last_height of block deploys have been sync up to.
     """
-    ANNOUNCE_INTERVAL = 500
+    ANNOUNCE_INTERVAL = 100
     cached_deploys_file = DATA_PATH / "deploy_cache.pbz2"
     if Path.exists(cached_deploys_file):
         deploys = load_bz2_pickle(cached_deploys_file)
@@ -158,7 +158,7 @@ def get_all_transfers():
 
     Key "last_height" stores last_height of block deploys have been sync up to.
     """
-    ANNOUNCE_INTERVAL = 500
+    ANNOUNCE_INTERVAL = 100
     cached_transfers_file = DATA_PATH / "transfer_cache.pbz2"
     if Path.exists(cached_transfers_file):
         transfers = load_bz2_pickle(cached_transfers_file)
