@@ -6,7 +6,7 @@ from collections import defaultdict
 from pathlib import Path
 from pickle_util import load_bz2_pickle, save_bz2_pickle
 
-NODE_ADDRESS = 'http://3.18.112.103:7777'
+NODE_ADDRESS = 'http://107.22.247.79:7777'
 CHAIN_NAME = 'delta-10'
 
 GET_GLOBAL_STATE_COMMAND = ["casper-client", "get-global-state-hash", "--node-address", NODE_ADDRESS]
@@ -82,6 +82,8 @@ def get_all_blocks():
 
     will be REALLY slow with large block downloads as calls are throttled.
     """
+    ANNOUNCE_INTERVAL = 500
+
     cached_blocks_file = DATA_PATH / "block_cache.pbz2"
     if Path.exists(cached_blocks_file):
         blocks = load_bz2_pickle(cached_blocks_file)
@@ -92,6 +94,7 @@ def get_all_blocks():
     block = get_block()["result"]["block"]
     new_blocks = []
     cur_height = block["header"]["height"]
+    announce_height = cur_height - ANNOUNCE_INTERVAL
     print(f"Downloading blocks from cur height: {cur_height} down to cached height: {last_height}.")
     for _ in range(cur_height - last_height):
         new_blocks.append(block)
@@ -99,7 +102,9 @@ def get_all_blocks():
         parent_hash = block["header"]["parent_hash"]
         if parent_hash != '0000000000000000000000000000000000000000000000000000000000000000':
             block = get_block(parent_hash)["result"]["block"]
-
+            if block["header"]["height"] == announce_height:
+                print(f"At block {announce_height}")
+                announce_height -= ANNOUNCE_INTERVAL
     new_blocks.reverse()
     blocks.extend(new_blocks)
     save_bz2_pickle(blocks, cached_blocks_file)
@@ -118,6 +123,7 @@ def get_all_deploys():
 
     Key "last_height" stores last_height of block deploys have been sync up to.
     """
+    ANNOUNCE_INTERVAL = 500
     cached_deploys_file = DATA_PATH / "deploy_cache.pbz2"
     if Path.exists(cached_deploys_file):
         deploys = load_bz2_pickle(cached_deploys_file)
@@ -127,6 +133,7 @@ def get_all_deploys():
     cache_height = deploys.get("last_height", 0)
     blocks = get_all_blocks()
     print(f"Downloading deploys from block height {cache_height} to {blocks[-1]['header']['height']}")
+    announce_height = cache_height + ANNOUNCE_INTERVAL
     for block in blocks[cache_height:]:
         cur_height = block["header"]["height"]
         if cur_height < cache_height:
@@ -134,6 +141,10 @@ def get_all_deploys():
         for deploy_hash in block["header"]["deploy_hashes"]:
             if deploy_hash not in deploys.keys():
                 deploys[deploy_hash] = get_deploy(deploy_hash)
+        if block["header"]["height"] == announce_height:
+            print(f"At block {announce_height}")
+            announce_height += ANNOUNCE_INTERVAL
+
     deploys["last_height"] = cur_height
     save_bz2_pickle(deploys, cached_deploys_file)
     return deploys
@@ -147,6 +158,7 @@ def get_all_transfers():
 
     Key "last_height" stores last_height of block deploys have been sync up to.
     """
+    ANNOUNCE_INTERVAL = 500
     cached_transfers_file = DATA_PATH / "transfer_cache.pbz2"
     if Path.exists(cached_transfers_file):
         transfers = load_bz2_pickle(cached_transfers_file)
@@ -155,6 +167,7 @@ def get_all_transfers():
     cur_height = 0
     cache_height = transfers.get("last_height", 0)
     blocks = get_all_blocks()
+    announce_height = cache_height + ANNOUNCE_INTERVAL
     print(f"Downloading transfers from block height {cache_height} to {blocks[-1]['header']['height']}")
     for block in blocks[cache_height:]:
         cur_height = block["header"]["height"]
@@ -163,6 +176,9 @@ def get_all_transfers():
         for transfer_hash in block["header"]["transfer_hashes"]:
             if transfer_hash not in transfers.keys():
                 transfers[transfer_hash] = get_deploy(transfer_hash)
+        if block["header"]["height"] == announce_height:
+            print(f"At block {announce_height}")
+            announce_height += ANNOUNCE_INTERVAL
     transfers["last_height"] = cur_height
     save_bz2_pickle(transfers, cached_transfers_file)
     return transfers
