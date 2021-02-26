@@ -34,9 +34,10 @@ def get_transfers_to_validation_account() -> dict:
     return account_ip
 
 
-account_ips = get_transfers_to_validation_account()
+def save_ip_mapping():
+    account_ips = get_transfers_to_validation_account()
 
-SCRIPT_DIR = Path(__file__).parent.absolute()
-DATA_FOLDER = SCRIPT_DIR / "data"
-VALIDATION_FILE = DATA_FOLDER / "validate_ip.pbz2"
-save_bz2_pickle(account_ips, VALIDATION_FILE)
+    SCRIPT_DIR = Path(__file__).parent.absolute()
+    DATA_FOLDER = SCRIPT_DIR / "data"
+    VALIDATION_FILE = DATA_FOLDER / "validate_ip.pbz2"
+    save_bz2_pickle(account_ips, VALIDATION_FILE)
