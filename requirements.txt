@@ -3,3 +3,6 @@ networkx
 matplotlib
 flask
 scipy
+sseclient
+sqlalchemy
+
