@@ -3,7 +3,6 @@ import asyncio
 
 STATUS_PORT = '8888'
 STATUS_PATH = 'status'
-INTERNAL_NODES = {'18.144.176.168', '13.57.200.251', '116.203.157.37'}
 
 
 class Spider:
@@ -52,7 +51,7 @@ class Spider:
         """
         data = None
         try:
-            response = requests.get(f"http://{ip}:8888/status", timeout=3)
+            response = requests.get(f"http://{ip}:{STATUS_PORT}/{STATUS_PATH}", timeout=3)
             if response.status_code == 200:
                 data = response.json()
                 data["peers"] = Spider._clean_peers(data["peers"])
@@ -86,8 +85,19 @@ class Spider:
                     for ip in result["peers"]:
                         self._all_ip.add(ip)
 
+    def active_node_keys(self, network_name):
+        self.get_all_nodes()
+        for node in self.nodes.values():
+            if node["chainspec_name"] == network_name:
+                yield node["our_public_signing_key"]
 
-if __name__ == '__main__':
-    spider = Spider(list(INTERNAL_NODES))
-    spider.get_all_nodes()
-    print(spider.nodes)
+    def get_weight_active_perc(self, validator_perc, network_name):
+        val_keys = set(validator_perc.keys())
+        node_keys = set(self.active_node_keys(network_name))
+        missing_keys = val_keys - node_keys
+        for key in missing_keys:
+            print(f"{key} - Inactive validator with weight: {round(validator_perc[key], 3)}%")
+        active_keys = val_keys.intersection(node_keys)
+        return sum([weight for key, weight in validator_perc.items()
+                    if key in active_keys])
+

@@ -5,4 +5,4 @@ flask
 scipy
 sseclient
 sqlalchemy
-
+toml
