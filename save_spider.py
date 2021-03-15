@@ -8,7 +8,7 @@ from network_graph import graph_nodes
 
 SCRIPT_DIR = Path(__file__).parent.absolute()
 DATA_FOLDER = SCRIPT_DIR / "data"
-NODES_FILE = DATA_FOLDER / f"nodes_{int(datetime.now().timestamp())}.pbz2"
+NODES_FILE = DATA_FOLDER / "nodes" / f"nodes_{int(datetime.now().timestamp())}.pbz2"
 LATEST_FILE = DATA_FOLDER / "nodes_latest.pbz2"
 GRAPH_FILE = DATA_FOLDER / "graph_latest.png"
 GRAPH_IPS_LATEST = DATA_FOLDER / "ips_latest.csv"
