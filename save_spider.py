@@ -5,8 +5,6 @@ from pathlib import Path
 from datetime import datetime
 from pickle_util import save_bz2_pickle
 from network_graph import graph_nodes
-from casper_node_util import cache_all
-from get_ip_key_mapping import save_ip_mapping
 
 SCRIPT_DIR = Path(__file__).parent.absolute()
 DATA_FOLDER = SCRIPT_DIR / "data"
@@ -16,11 +14,14 @@ GRAPH_FILE = DATA_FOLDER / "graph_latest.png"
 GRAPH_IPS_LATEST = DATA_FOLDER / "ips_latest.csv"
 
 
+NETWORK_NAME = "delta-11"
+IPS = ['18.144.176.168']
+
 if not DATA_FOLDER.exists():
     raise Exception(f"{DATA_FOLDER} does not exist.")
 
 
-spider = Spider(['18.144.176.168'])
+spider = Spider(IPS, NETWORK_NAME)
 spider.get_all_nodes()
 
 save_bz2_pickle(spider.nodes, NODES_FILE)
