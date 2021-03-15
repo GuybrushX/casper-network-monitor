@@ -2,6 +2,11 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from collections import defaultdict
 from pickle_util import save_bz2_pickle
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).parent.absolute()
+DATA_FOLDER = SCRIPT_DIR / "data"
+NETWORK_INFO_PATH = DATA_FOLDER / "network_info.pbz2"
 
 
 def all_ips_dict(nodes):
@@ -26,7 +31,6 @@ def save_network_info(g, ip_index, nodes):
     full_counts = set(peer_count.keys()).union(set(two_way_count.keys()))
     for count in sorted(full_counts, reverse=True):
         combined_count.append((count, peer_count.get(count, 0), two_way_count.get(count, 0)))
-    save_bz2_pickle(combined_count, "data/peer_counts.pbz")
 
     path_len = defaultdict(int)
     for ip in ip_index.keys():
@@ -43,10 +47,10 @@ def save_network_info(g, ip_index, nodes):
     save_bz2_pickle({"node_count": len(nodes.keys()),
                      "peer_count": combined_count,
                      "path_count": path_count},
-                    "data/network_info.pbz2")
+                    NETWORK_INFO_PATH)
 
 
-def graph_nodes(nodes, filepath, fig_size=(10, 10)):
+def graph_nodes(nodes, filepath, fig_size=(20, 20)):
     g = nx.Graph()
     ip_index = all_ips_dict(nodes)
 

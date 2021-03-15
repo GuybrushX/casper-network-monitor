@@ -5,17 +5,19 @@ from pathlib import Path
 app = Flask(__name__)
 SCRIPT_DIR = Path(__file__).parent.absolute()
 DATA_FOLDER = SCRIPT_DIR / "data"
+PEER_COUNTS_PATH = DATA_FOLDER / "peer_counts.pbz2"
+IMAGE_PATH = DATA_FOLDER / "graph_latest.png"
 
 
 @app.route('/')
 def nodes():
-    nodes = load_bz2_pickle("data/nodes_latest.pbz2")
+    nodes = load_bz2_pickle(PEER_COUNTS_PATH)
     return render_template('index.html', nodes=list(nodes.values()), network_name="delta-11")
 
 
 @app.route('/img')
 def get_image():
-    return send_file("data/graph_latest.png", mimetype="image/png")
+    return send_file(IMAGE_PATH, mimetype="image/png")
 
 
 @app.route('/network')
@@ -39,11 +41,6 @@ def network_info():
     output.append("</table>")
     output.append('<img src="./img" width="100%"/></html>')
     return ''.join(output)
-
-
-@app.route('/ips')
-def ips():
-    return send_file("data/ips_latest.csv", mimetype='text/text')
 
 
 if __name__ == '__main__':
