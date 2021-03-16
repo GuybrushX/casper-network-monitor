@@ -5,13 +5,13 @@ from pathlib import Path
 app = Flask(__name__)
 SCRIPT_DIR = Path(__file__).parent.absolute()
 DATA_FOLDER = SCRIPT_DIR / "data"
-PEER_COUNTS_PATH = DATA_FOLDER / "peer_counts.pbz2"
+NODES_LATEST_PATH = DATA_FOLDER / "nodes_latest.pbz2"
 IMAGE_PATH = DATA_FOLDER / "graph_latest.png"
 
 
 @app.route('/')
 def nodes():
-    nodes = load_bz2_pickle(PEER_COUNTS_PATH)
+    nodes = load_bz2_pickle(NODES_LATEST_PATH)
     return render_template('index.html', nodes=list(nodes.values()), network_name="delta-11")
 
 

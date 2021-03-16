@@ -54,16 +54,16 @@ def graph_nodes(nodes, filepath, fig_size=(20, 20)):
     g = nx.Graph()
     ip_index = all_ips_dict(nodes)
 
-    color_map = []
+    # color_map = []
     for ip, index in ip_index.items():
         for peer_ip in nodes[ip]["two_way_peers"]:
             g.add_edge(ip_index[ip], ip_index[peer_ip])
-        if nodes[ip]["is_validator"]:
-            color_map.append('red')
-        else:
-            color_map.append('blue')
+    #     if nodes[ip]["is_validator"]:
+    #         color_map.append('red')
+    #     else:
+    #         color_map.append('blue')
     plt.figure(1, figsize=fig_size)
-    nx.draw(g, with_labels=True, node_color=color_map)
+    nx.draw(g, with_labels=True) #, node_color=color_map)
     plt.savefig(filepath)
     save_network_info(g, ip_index, nodes)
     return list(ip_index.items())
