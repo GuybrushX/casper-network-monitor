@@ -35,6 +35,7 @@
         <th>Block Hash</th>
         <th>Build Version</th>
         <th>SSRHash</th>
+        <th>Upgrade</th>
       </tr>
     </thead>
 
@@ -50,6 +51,7 @@
       <td>{{ node["last_added_block_info"]["hash"] if node["last_added_block_info"] is not none }}</td>
       <td>{{ node["build_version"] }}</td>
       <td>{{ node["starting_state_root_hash"] }}</td>
+      <td>{{ node["next_upgrade"]["activation_point"] if node["next_upgrade"] is not none }}</td>
     </tr>
     {% endfor %}
   </table>
