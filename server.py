@@ -38,7 +38,7 @@ def network_info():
         if node["next_upgrade"] is None:
             upgrade = 'None'
         else:
-            upgrade = node["next_upgrade"]["activation_point"]
+            upgrade = str(node["next_upgrade"]["activation_point"])
         if node.get("is_validator"):
             weight = node.get("weight_percent", 0)
             weight_pct[upgrade] += weight
@@ -56,7 +56,7 @@ def network_info():
     return render_template('network.html',
                            peer_counts=net_info["peer_count"],
                            path_counts=net_info["path_count"],
-                           upgrade_states=upgrade_states)
+                           upgrade_states=sorted(upgrade_states, key=lambda d: d["state"], reverse=True))
 
 
 if __name__ == '__main__':
