@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Network Details</title>
+</head>
+<body>
+
+<table border=1 style="float: left">
+    <tr>
+        <th>Peer Count</th>
+        <th>One Way</th>
+        <th>Two Way</th>
+    </tr>
+    {% for pc in peer_counts %}
+    <tr>
+        <td>{{ pc[0] }}</td>
+        <td>{{ pc[1] }}</td>
+        <td>{{ pc[2] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<table border=1 style="float: left">
+    <tr>
+        <th>Path Len</th>
+        <th>Count</th>
+    </tr>
+    {% for path, count in path_counts %}
+        <tr>
+            <td>{{ path }}</td>
+            <td>{{ count }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<table border=1 style="float: left">
+    <tr>
+        <th>Upgrade State</th>
+        <th>Val Node</th>
+        <th>Val Wgt</th>
+        <th>All Node</th>
+    </tr>
+    {% for upgrade in upgrade_states %}
+    <tr>
+        <td>{{ upgrade["state"] }}</td>
+        <td>{{ upgrade["val_node_pct"] }}%</td>
+        <td>{{ upgrade["val_wgt_pct"] }}%</td>
+        <td>{{ upgrade["all_node_pct"] }}%</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<img alt="Network graph" src="./img" width="100%" style="float: left"/>
+</body>
+</html>
