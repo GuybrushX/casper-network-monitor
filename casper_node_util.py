@@ -41,12 +41,15 @@ def get_auction_info(node_addr):
 
 def get_last_auction_era(node_addr):
     gai = get_auction_info(node_addr)
-    era_validators = gai["result"]["era_validators"]
+    era_validators = gai["result"]["auction_state"]["era_validators"]
     return era_validators[-1]
 
 
-def get_auction_era_key_weight(era):
-    return [(v["public_key"], int(v["weight"])) for v in era["validator_weights"]]
+def get_last_auction_era_key_weight(node_addr) -> dict:
+    gai = get_auction_info(node_addr)
+    eras = gai["result"]["auction_state"]["era_validators"]
+    era = eras[-1]
+    return {v["public_key"]: int(v["weight"]) for v in era["validator_weights"]}
 
 
 def get_global_state_hash():

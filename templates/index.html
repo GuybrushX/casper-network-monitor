@@ -36,6 +36,8 @@
         <th>Build Version</th>
         <th>SSRHash</th>
         <th>Upgrade</th>
+        <th>Wgt %</th>
+        <th>Weight</th>
       </tr>
     </thead>
 
@@ -52,6 +54,8 @@
       <td>{{ node["build_version"] }}</td>
       <td>{{ node["starting_state_root_hash"] }}</td>
       <td>{{ node["next_upgrade"]["activation_point"] if node["next_upgrade"] is not none }}</td>
+      <td>{{ node["weight_percent"] if node["weight_percent"] is not none }}</td>
+      <td>{{ node["weight"] if node["weight"] is not none }}</td>
     </tr>
     {% endfor %}
   </table>
