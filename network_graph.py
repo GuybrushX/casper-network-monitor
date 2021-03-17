@@ -42,6 +42,10 @@ def save_network_info(g, ip_index, nodes):
                 continue
             if id_a == id_b:
                 continue
+            if id_a not in g:
+                continue
+            if id_b not in g:
+                continue
             path_len[nx.shortest_path_length(g, id_a, id_b)] += 1
     path_count = [(path, count) for path, count in sorted(path_len.items(), key=lambda d: d[0])]
     save_bz2_pickle({"node_count": len(nodes.keys()),
