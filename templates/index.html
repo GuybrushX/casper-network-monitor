@@ -34,6 +34,7 @@
         <th>Block TimeStamp</th>
         <th>Block Hash</th>
         <th>Build Version</th>
+        <th>API Version</th>
         <th>SSRHash</th>
         <th>Upgrade</th>
         <th>Wgt %</th>
@@ -52,6 +53,7 @@
       <td>{{ node["last_added_block_info"]["timestamp"] if node["last_added_block_info"] is not none }}</td>
       <td>{{ node["last_added_block_info"]["hash"] if node["last_added_block_info"] is not none }}</td>
       <td>{{ node["build_version"] }}</td>
+      <td>{{ node["api_version"] }}</td>
       <td>{{ node["starting_state_root_hash"] }}</td>
       <td>{{ node["next_upgrade"]["activation_point"] if node["next_upgrade"] is not none }}</td>
       <td>{{ node["weight_percent"] if node["weight_percent"] is not none }}</td>
