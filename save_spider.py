@@ -77,10 +77,11 @@ IPS = """18.144.176.168
 if not DATA_FOLDER.exists():
     raise Exception(f"{DATA_FOLDER} does not exist.")
 
-
+print("Getting key weight")
 key_weight = get_last_auction_era_key_weight(f"http://{IPS[0]}:7777")
 total_weight = sum(key_weight.values())
 
+print("Getting nodes from spider")
 spider = Spider(IPS, NETWORK_NAME)
 spider.get_all_nodes()
 for node in spider.nodes.values():
@@ -92,5 +93,6 @@ for node in spider.nodes.values():
 save_bz2_pickle(spider.nodes, NODES_FILE)
 save_bz2_pickle(spider.nodes, LATEST_FILE)
 
+print("Graphing nodes")
 ip_list = graph_nodes(spider.nodes, GRAPH_FILE)
 GRAPH_IPS_LATEST.write_text('\n'.join([f"{ip},{index}" for index, ip in ip_list]))
