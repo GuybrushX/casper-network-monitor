@@ -27,37 +27,33 @@ def network_info():
     # need to replace with template.
     net_info = load_bz2_pickle(NETWORK_INFO_PATH)
     nodes = load_bz2_pickle(NODES_LATEST_PATH)
-    distinct_upgrades = set()
-    valid_upg = defaultdict(int)
+
+    valid_ver = defaultdict(int)
     weight_pct = defaultdict(int)
-    all_upg = defaultdict(int)
+    all_ver = defaultdict(int)
     node_count = 0
     val_count = 0
     for node in nodes.values():
         node_count += 1
-        if node["next_upgrade"] is None:
-            upgrade = 'None'
-        else:
-            upgrade = str(node["next_upgrade"]["activation_point"])
+        version = node["api_version"]
         if node.get("is_validator"):
             weight = node.get("weight_percent", 0)
-            weight_pct[upgrade] += weight
-            valid_upg[upgrade] += 1
+            weight_pct[version] += weight
+            valid_ver[version] += 1
             val_count += 1
-        all_upg[upgrade] += 1
+        all_ver[version] += 1
 
-    upgrade_states = []
-    for key, val in all_upg.items():
-        upgrade_states.append({"state": key,
-                               "all_node_pct": round(val / node_count * 100, 2),
-                               "val_node_pct": round(valid_upg.get(key, 0) / val_count * 100, 2),
-                               "val_wgt_pct": round(weight_pct.get(key, 0), 2)})
-
+    versions = []
+    for key, val in all_ver.items():
+        versions.append({"version": key,
+                         "all_node_pct": round(val / node_count * 100, 2),
+                         "val_node_pct": round(valid_ver.get(key, 0) / val_count * 100, 2),
+                         "val_wgt_pct": round(weight_pct.get(key, 0), 2)})
     return render_template('network.html',
                            peer_counts=net_info["peer_count"],
                            path_counts=net_info["path_count"],
-                           upgrade_states=sorted(upgrade_states, key=lambda d: d["state"], reverse=True))
+                           versions=sorted(versions, key=lambda d: d["version"], reverse=True))
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=80)
+    app.run(host="0.0.0.0", port=8080)

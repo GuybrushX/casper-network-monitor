@@ -74,19 +74,19 @@ table th {
 </table>
 
 <table border=1 style="float: left">
-    <caption>Upgrade Status</caption>
+    <caption>Version Status</caption>
     <tr>
-        <th>Activation</th>
+        <th>Version</th>
         <th>Validator Nodes</th>
         <th>Validator Wgt</th>
         <th>All Nodes</th>
     </tr>
-    {% for upgrade in upgrade_states %}
+    {% for version in versions %}
     <tr>
-        <td>{{ upgrade["state"] }}</td>
-        <td>{{ upgrade["val_node_pct"] }}%</td>
-        <td>{{ upgrade["val_wgt_pct"] }}%</td>
-        <td>{{ upgrade["all_node_pct"] }}%</td>
+        <td>{{ version["version"] }}</td>
+        <td>{{ version["val_node_pct"] }}%</td>
+        <td>{{ version["val_wgt_pct"] }}%</td>
+        <td>{{ version["all_node_pct"] }}%</td>
     </tr>
     {% endfor %}
 </table>
