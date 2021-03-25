@@ -1,9 +1,11 @@
 import requests
 import toml
 
+GIT_HASH = "04d4409244789246e6fd7508b0b9fca2f0029744"
 
 def get_data(public_key: str) -> dict:
-    resp = requests.get('https://raw.githubusercontent.com/CasperLabs/casper-node/release-1.0.0/resources/production/accounts.toml')
+    url = f"https://raw.githubusercontent.com/CasperLabs/casper-node/{GIT_HASH}/resources/production/accounts.toml"
+    resp = requests.get(url)
     a_toml = toml.loads(resp.text)
 
     accounts = a_toml.get("accounts", None)
