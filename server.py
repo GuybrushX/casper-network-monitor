@@ -23,9 +23,16 @@ def get_image():
     return send_file(IMAGE_PATH, mimetype="image/png")
 
 
+@app.route('/genesis')
+def genesis_empty():
+    return "Load with public_key_hash as http://cnm.casperlabs.io/genesis/<public_key_hash>"
+
+
 @app.route('/genesis/<public_key>')
 def genesis(public_key):
     output = get_data(public_key)
+    if output["validator"] is None and len(output["delegated_to"]) == 0 and len(output["delegation"]) == 0:
+        return "Not Found"
     return render_template('genesis.html', output=output)
 
 
@@ -63,4 +70,4 @@ def network_info():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=80)

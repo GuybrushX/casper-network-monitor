@@ -44,7 +44,13 @@ table th {
 <body>
 {% if output["validator"] is not none %}
 <table border=1 style="float: left">
-    <caption>Account or Validator</caption>
+    <caption>
+    {% if output["validator"]["delegation"] is not none %}
+        Validator
+    {% else %}
+        Account
+    {% endif %}
+    </caption>
     <tr>
         <th>Public Key</th>
         <th>Balance</th>
