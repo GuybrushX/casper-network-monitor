@@ -2,7 +2,7 @@ from flask import Flask, send_file, render_template
 from pickle_util import load_bz2_pickle
 from pathlib import Path
 from collections import defaultdict
-from accounts_toml import get_data
+from accounts_toml import get_data, GIT_HASH
 
 app = Flask(__name__)
 SCRIPT_DIR = Path(__file__).parent.absolute()
@@ -33,7 +33,7 @@ def genesis(public_key):
     output = get_data(public_key)
     if output["validator"] is None and len(output["delegated_to"]) == 0 and len(output["delegation"]) == 0:
         return "Not Found"
-    return render_template('genesis.html', output=output)
+    return render_template('genesis.html', output=output, hash=GIT_HASH)
 
 
 @app.route('/network')
