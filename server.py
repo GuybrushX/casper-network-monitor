@@ -2,6 +2,7 @@ from flask import Flask, send_file, render_template
 from pickle_util import load_bz2_pickle
 from pathlib import Path
 from collections import defaultdict
+from accounts_toml import get_data
 
 app = Flask(__name__)
 SCRIPT_DIR = Path(__file__).parent.absolute()
@@ -20,6 +21,12 @@ def nodes():
 @app.route('/img')
 def get_image():
     return send_file(IMAGE_PATH, mimetype="image/png")
+
+
+@app.route('/genesis/<public_key>')
+def genesis(public_key):
+    output = get_data(public_key)
+    return render_template('genesis.html', output=output)
 
 
 @app.route('/network')
@@ -56,4 +63,4 @@ def network_info():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=80)
+    app.run(host="0.0.0.0", port=8080)
