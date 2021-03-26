@@ -2,7 +2,7 @@ from flask import Flask, send_file, render_template
 from pickle_util import load_bz2_pickle
 from pathlib import Path
 from collections import defaultdict
-from accounts_toml import get_data, GIT_HASH
+from accounts_toml import get_data, GIT_HASH, get_summary
 from protocol import get_chainspec_config_readme
 
 app = Flask(__name__)
@@ -26,7 +26,8 @@ def get_image():
 
 @app.route('/genesis')
 def genesis_empty():
-    return "Load with public_key_hash as http://cnm.casperlabs.io/genesis/<public_key_hash>"
+    data = get_summary()
+    return render_template('genesis_summary.html', data=data, hash=GIT_HASH)
 
 
 @app.route('/genesis/<public_key>')
@@ -41,6 +42,7 @@ def genesis(public_key):
 def protocol(network, protocol):
     chainspec, config, readme = get_chainspec_config_readme(protocol, network)
     return render_template('protocol.html', chainspec=chainspec, config=config, readme=readme)
+
 
 @app.route('/network')
 def network_info():

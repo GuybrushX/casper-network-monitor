@@ -3,11 +3,15 @@ import toml
 
 GIT_HASH = "04d4409244789246e6fd7508b0b9fca2f0029744"
 
-def get_data(public_key: str) -> dict:
+
+def get_accounts_toml():
     url = f"https://raw.githubusercontent.com/CasperLabs/casper-node/{GIT_HASH}/resources/production/accounts.toml"
     resp = requests.get(url)
-    a_toml = toml.loads(resp.text)
+    return toml.loads(resp.text)
 
+
+def get_data(public_key: str) -> dict:
+    a_toml = get_accounts_toml()
     accounts = a_toml.get("accounts", None)
     delegators = a_toml.get("delegators", None)
 
@@ -51,9 +55,40 @@ def get_data(public_key: str) -> dict:
     return output
 
 
+def get_summary():
+    a_toml = get_accounts_toml()
+    accounts = a_toml.get("accounts", None)
+    delegators = a_toml.get("delegators", None)
+
+    data = []
+    total_amt = 0
+    for account in accounts:
+        key = account["public_key"]
+        validator = account.get("validator", None)
+        bonded = None
+        del_rate = None
+        if validator is not None:
+            bonded = int(validator.get("bonded_amount", 0))
+            del_rate = validator.get("delegation_rate", None)
+            total_amt += bonded
+
+        del_total = 0
+        for delegator in delegators:
+            if delegator["validator_public_key"] == key:
+                del_total += int(delegator.get("delegated_amount", 0))
+        total_amt += del_total
+
+        data.append([key, bonded, del_rate, del_total, bonded + del_total])
+    data = [d + [round(d[4]/total_amt * 100, 2)] for d in data]
+    return sorted(data, key=lambda d: d[4], reverse=True)
+
+
 if __name__ == '__main__':
-    for key in ["010a78eef78966a56a633c665411388f97f850609960d5d898f3992272b8d4bcca",
-                "019ecde420395f4a9b70be2d4db0ab914682e04705cc2d7d3d73d958c7e69bfff8",
-                "01a60e0885f4968dd3107e088b4cb5798af665859b769bc1aa86909a5b67f66a66",
-                "012034668d7a5844f4fce1c3672c8d54daa81adb6d230a4aeeccaa8b369f0178fc"]:
-        print(get_data(key))
+    # for key in ["010a78eef78966a56a633c665411388f97f850609960d5d898f3992272b8d4bcca",
+    #             "019ecde420395f4a9b70be2d4db0ab914682e04705cc2d7d3d73d958c7e69bfff8",
+    #             "01a60e0885f4968dd3107e088b4cb5798af665859b769bc1aa86909a5b67f66a66",
+    #             "012034668d7a5844f4fce1c3672c8d54daa81adb6d230a4aeeccaa8b369f0178fc"]:
+    #     print(get_data(key))
+    #
+    for data in get_summary():
+        print(data)
