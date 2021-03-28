@@ -65,7 +65,7 @@ def get_summary():
     for account in accounts:
         key = account["public_key"]
         validator = account.get("validator", None)
-        bonded = None
+        bonded = 0
         del_rate = None
         if validator is not None:
             bonded = int(validator.get("bonded_amount", 0))
