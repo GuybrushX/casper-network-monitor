@@ -26,8 +26,14 @@ def get_image():
 
 @app.route('/genesis')
 def genesis_empty():
-    data = get_summary()
-    return render_template('genesis_summary.html', data=data, hash=GIT_HASH)
+    validators, accounts = get_summary()
+    total_supply = sum([d[-2] for d in validators])
+    total_supply += sum(d[-1] for d in accounts)
+    return render_template('genesis_summary.html',
+                           validators=validators,
+                           accounts=accounts,
+                           hash=GIT_HASH,
+                           total_supply=total_supply)
 
 
 @app.route('/genesis/<public_key>')

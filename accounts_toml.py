@@ -60,27 +60,29 @@ def get_summary():
     accounts = a_toml.get("accounts", None)
     delegators = a_toml.get("delegators", None)
 
-    data = []
+    validators = []
     total_amt = 0
+    account_only = []
     for account in accounts:
         key = account["public_key"]
         validator = account.get("validator", None)
-        bonded = 0
-        del_rate = None
-        if validator is not None:
+        if validator is None:
+            balance = int(account["balance"])
+            account_only.append((key, balance))
+        else:
             bonded = int(validator.get("bonded_amount", 0))
             del_rate = validator.get("delegation_rate", None)
             total_amt += bonded
 
-        del_total = 0
-        for delegator in delegators:
-            if delegator["validator_public_key"] == key:
-                del_total += int(delegator.get("delegated_amount", 0))
-        total_amt += del_total
+            del_total = 0
+            for delegator in delegators:
+                if delegator["validator_public_key"] == key:
+                    del_total += int(delegator.get("delegated_amount", 0))
+            total_amt += del_total
 
-        data.append([key, bonded, del_rate, del_total, bonded + del_total])
-    data = [d + [round(d[4]/total_amt * 100, 2)] for d in data]
-    return sorted(data, key=lambda d: d[4], reverse=True)
+            validators.append([key, bonded, del_rate, del_total, bonded + del_total])
+    validators = [d + [round(d[4]/total_amt * 100, 2)] for d in validators if d[-1] > 0]
+    return sorted(validators, key=lambda d: d[4], reverse=True), sorted(account_only, key=lambda d: d[1], reverse=True)
 
 
 if __name__ == '__main__':

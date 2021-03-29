@@ -43,6 +43,7 @@ table th {
 </head>
 <body>
 <p>From git hash: {{ hash }}</p>
+<p>Total Supply: {{ total_supply }}</p>
 <table border=1 style="float: left">
     <tr>
         <th>Validator Public Key</th>
@@ -52,7 +53,7 @@ table th {
         <th>Total Weight</th>
         <th>Weight Pct</th>
     </tr>
-    {% for d in data %}
+    {% for d in validators %}
     <tr>
         <td><a href="./genesis/{{ d[0] }}">{{ d[0] }}</a></td>
         <td>{{ d[1] }}</td>
@@ -60,6 +61,19 @@ table th {
         <td>{{ d[3] }}</td>
         <td>{{ d[4] }}</td>
         <td>{{ d[5] }}%</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<table border=1 style="float: left">
+    <tr>
+        <th>Account Public Key</th>
+        <th>Balance</th>
+    </tr>
+    {% for d in accounts %}
+    <tr>
+        <td>{{ d[0] }}</td>
+        <td>{{ d[1] }}</td>
     </tr>
     {% endfor %}
 </table>
