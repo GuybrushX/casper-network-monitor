@@ -1,7 +1,7 @@
 import requests
 import toml
 
-GIT_HASH = "e7d6a654fb88870aaa6a05fa9ceaf42a2ea88aa2"
+GIT_HASH = "87a0e98b37e74d08a26c348e8fd16d68d5276465"
 
 
 def get_accounts_toml():
