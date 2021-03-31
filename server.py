@@ -16,7 +16,7 @@ IMAGE_PATH = DATA_FOLDER / "graph_latest.png"
 @app.route('/')
 def nodes():
     nodes = load_bz2_pickle(NODES_LATEST_PATH)
-    return render_template('index.html', nodes=list(nodes.values()), network_name="delta-11")
+    return render_template('index.html', nodes=list(nodes.values()), network_name="casper")
 
 
 @app.route('/img')
@@ -24,24 +24,24 @@ def get_image():
     return send_file(IMAGE_PATH, mimetype="image/png")
 
 
-@app.route('/genesis')
-def genesis_empty():
-    validators, accounts = get_summary()
-    total_supply = sum([d[-2] for d in validators])
-    total_supply += sum(d[-1] for d in accounts)
-    return render_template('genesis_summary.html',
-                           validators=validators,
-                           accounts=accounts,
-                           hash=GIT_HASH,
-                           total_supply=total_supply)
-
-
-@app.route('/genesis/<public_key>')
-def genesis(public_key):
-    output = get_data(public_key)
-    if output["validator"] is None and len(output["delegated_to"]) == 0 and len(output["delegation"]) == 0:
-        return "Not Found"
-    return render_template('genesis.html', output=output, hash=GIT_HASH)
+# @app.route('/genesis')
+# def genesis_empty():
+#     validators, accounts = get_summary()
+#     total_supply = sum([d[-2] for d in validators])
+#     total_supply += sum(d[-1] for d in accounts)
+#     return render_template('genesis_summary.html',
+#                            validators=validators,
+#                            accounts=accounts,
+#                            hash=GIT_HASH,
+#                            total_supply=total_supply)
+#
+#
+# @app.route('/genesis/<public_key>')
+# def genesis(public_key):
+#     output = get_data(public_key)
+#     if output["validator"] is None and len(output["delegated_to"]) == 0 and len(output["delegation"]) == 0:
+#         return "Not Found"
+#     return render_template('genesis.html', output=output, hash=GIT_HASH)
 
 
 @app.route('/protocol/<network>/<protocol>')

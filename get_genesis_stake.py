@@ -3,16 +3,20 @@ from tempfile import TemporaryDirectory
 import tarfile
 import toml
 from pickle_util import save_pickle
+from pathlib import Path
 
 # Generates a key to weight percent dictionary from config.tar.gz at
 # a certain path, but downloading and parsing.
 
 
 PULL_URL = "http://genesis.casperlabs.io"
-NETWORK_NAME = "delta-11"
+NETWORK_NAME = "casper"
 PROTOCOL = "1_0_0"
 CONFIG_ARCHIVE = "config.tar.gz"
-SAVE_FILE_NAME = "account_percent.pkl"
+SCRIPT_DIR = Path(__file__).parent.absolute()
+DATA_FOLDER = SCRIPT_DIR / "data"
+SAVE_FILE_PATH = DATA_FOLDER / "account_percent.pkl"
+
 
 accounts_toml = None
 with TemporaryDirectory() as temp_dir:
@@ -48,4 +52,11 @@ account_percent = {}
 for key, weight in account_weight.items():
     account_percent[key] = weight/total_weight * 100
 
-save_pickle(account_percent, f"data/{SAVE_FILE_NAME}")
+total_percent = 0
+for key, percent in sorted(account_percent.items(), key=lambda d: d[1], reverse=True):
+    print(f"{key}\t{round(percent, 2)}")
+    total_percent += percent
+
+print(f"Total Percent: {total_percent} across {len(account_percent.keys())}")
+
+save_pickle(account_percent, SAVE_FILE_PATH)

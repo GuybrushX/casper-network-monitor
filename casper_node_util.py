@@ -6,8 +6,8 @@ from collections import defaultdict
 from pathlib import Path
 from pickle_util import load_bz2_pickle, save_bz2_pickle
 
-NODE_ADDRESS = 'http://107.22.247.79:7777'
-CHAIN_NAME = 'delta-10'
+NODE_ADDRESS = 'http://18.220.220.20:7777'
+CHAIN_NAME = 'casper'
 
 GET_GLOBAL_STATE_COMMAND = ["casper-client", "get-global-state-hash", "--node-address", NODE_ADDRESS]
 
