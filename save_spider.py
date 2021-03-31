@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime
 from pickle_util import save_bz2_pickle
 from network_graph import graph_nodes
-from casper_node_util import get_last_auction_era_key_weight, get_current_era_key_weight
+from casper_node_util import get_last_auction_era_key_weight
 
 SCRIPT_DIR = Path(__file__).parent.absolute()
 DATA_FOLDER = SCRIPT_DIR / "data"
