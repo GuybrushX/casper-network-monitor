@@ -9,7 +9,7 @@ from pickle_util import save_pickle
 
 
 PULL_URL = "http://genesis.casperlabs.io"
-NETWORK_NAME = "delta-11"
+NETWORK_NAME = "casper"
 PROTOCOL = "1_0_0"
 CONFIG_ARCHIVE = "config.tar.gz"
 SAVE_FILE_NAME = "account_percent.pkl"
