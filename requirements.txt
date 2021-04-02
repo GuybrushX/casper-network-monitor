@@ -6,3 +6,4 @@ scipy
 sseclient
 sqlalchemy
 toml
+pytz
