@@ -79,7 +79,10 @@ def network_info(network_name):
     val_count = 0
     for node in nodes.values():
         node_count += 1
-        version = node["api_version"]
+        upgrade = "None"
+        if node["next_upgrade"]:
+            upgrade = node["next_upgrade"]["activation_point"]
+        version = f"{node['api_version']} - Upgrade: {upgrade}"
         if node.get("is_validator"):
             weight = node.get("weight_percent", 0)
             weight_pct[version] += weight
