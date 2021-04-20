@@ -26,7 +26,7 @@ def network_info_path(network_name: str) -> Path:
 
 @app.route('/')
 def networks():
-    return "/n".join([net.name for net in NETWORKS])
+    return render_template('networks.html', networks=NETWORKS)
 
 
 @app.route('/<network_name>')
