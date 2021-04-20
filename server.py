@@ -4,24 +4,40 @@ from pathlib import Path
 from collections import defaultdict
 from accounts_toml import get_data, GIT_HASH, get_summary
 from protocol import get_chainspec_config_readme
+from networks import NETWORKS
+
 
 app = Flask(__name__)
 SCRIPT_DIR = Path(__file__).parent.absolute()
 DATA_FOLDER = SCRIPT_DIR / "data"
-NODES_LATEST_PATH = DATA_FOLDER / "nodes_latest.pbz2"
-NETWORK_INFO_PATH = DATA_FOLDER / "network_info.pbz2"
-IMAGE_PATH = DATA_FOLDER / "graph_latest.png"
+
+
+def nodes_latest_path(network_name: str) -> Path:
+    return DATA_FOLDER / network_name / "nodes_latest.pbz2"
+
+
+def image_path(network_name: str) -> Path:
+    return DATA_FOLDER / network_name / "graph_latest.png"
+
+
+def network_info_path(network_name: str) -> Path:
+    return DATA_FOLDER / network_name/ "network_info.pbz2"
 
 
 @app.route('/')
-def nodes():
-    nodes = load_bz2_pickle(NODES_LATEST_PATH)
-    return render_template('index.html', nodes=list(nodes.values()), network_name="casper")
+def networks():
+    return "/n".join([net.name for net in NETWORKS])
 
 
-@app.route('/img')
-def get_image():
-    return send_file(IMAGE_PATH, mimetype="image/png")
+@app.route('/<network_name>')
+def nodes(network_name):
+    nodes = load_bz2_pickle(nodes_latest_path(network_name))
+    return render_template('index.html', nodes=list(nodes.values()), network_name=network_name)
+
+
+@app.route('/<network_name>/img')
+def get_image(network_name):
+    return send_file(image_path(network_name), mimetype="image/png")
 
 
 @app.route('/genesis')
@@ -44,17 +60,17 @@ def genesis(public_key):
     return render_template('genesis.html', output=output, hash=GIT_HASH)
 
 
-@app.route('/protocol/<network>/<protocol>')
+@app.route('/<network>/<protocol>')
 def protocol(network, protocol):
     chainspec, config, readme = get_chainspec_config_readme(protocol, network)
     return render_template('protocol.html', chainspec=chainspec, config=config, readme=readme)
 
 
-@app.route('/network')
-def network_info():
+@app.route('/<network_name>/network')
+def network_info(network_name):
     # need to replace with template.
-    net_info = load_bz2_pickle(NETWORK_INFO_PATH)
-    nodes = load_bz2_pickle(NODES_LATEST_PATH)
+    net_info = load_bz2_pickle(network_info_path(network_name))
+    nodes = load_bz2_pickle(nodes_latest_path(network_name))
 
     valid_ver = defaultdict(int)
     weight_pct = defaultdict(int)

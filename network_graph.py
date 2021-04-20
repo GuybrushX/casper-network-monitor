@@ -6,7 +6,6 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent.absolute()
 DATA_FOLDER = SCRIPT_DIR / "data"
-NETWORK_INFO_PATH = DATA_FOLDER / "network_info.pbz2"
 
 
 def all_ips_dict(nodes):
@@ -18,7 +17,7 @@ def all_ips_dict(nodes):
     return {ip: index for index, ip in enumerate(ips)}
 
 
-def save_network_info(g, ip_index, nodes):
+def save_network_info(g, ip_index, nodes, network_info_file_path):
     peer_count = defaultdict(int)
     two_way_count = defaultdict(int)
     for node in nodes.values():
@@ -51,23 +50,18 @@ def save_network_info(g, ip_index, nodes):
     save_bz2_pickle({"node_count": len(nodes.keys()),
                      "peer_count": combined_count,
                      "path_count": path_count},
-                    NETWORK_INFO_PATH)
+                    network_info_file_path)
 
 
-def graph_nodes(nodes, filepath, fig_size=(20, 20)):
+def graph_nodes(nodes, image_file_path, network_info_file_path, fig_size=(20, 20)):
     g = nx.Graph()
     ip_index = all_ips_dict(nodes)
 
-    # color_map = []
     for ip, index in ip_index.items():
         for peer_ip in nodes[ip]["two_way_peers"]:
             g.add_edge(ip_index[ip], ip_index[peer_ip])
-    #     if nodes[ip]["is_validator"]:
-    #         color_map.append('red')
-    #     else:
-    #         color_map.append('blue')
     plt.figure(1, figsize=fig_size)
-    nx.draw(g, with_labels=True) #, node_color=color_map)
-    plt.savefig(filepath)
-    save_network_info(g, ip_index, nodes)
+    nx.draw(g, with_labels=True)
+    plt.savefig(image_file_path)
+    save_network_info(g, ip_index, nodes, network_info_file_path)
     return list(ip_index.items())
