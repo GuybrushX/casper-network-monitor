@@ -7,3 +7,4 @@ sseclient
 sqlalchemy
 toml
 pytz
+Flask-BasicAuth

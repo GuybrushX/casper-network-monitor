@@ -4,6 +4,7 @@ from collections import defaultdict
 from pickle_util import save_bz2_pickle
 from pathlib import Path
 
+
 SCRIPT_DIR = Path(__file__).parent.absolute()
 DATA_FOLDER = SCRIPT_DIR / "data"
 
@@ -45,7 +46,9 @@ def save_network_info(g, ip_index, nodes, network_info_file_path):
                 continue
             if id_b not in g:
                 continue
+            # This is really slow
             path_len[nx.shortest_path_length(g, id_a, id_b)] += 1
+
     path_count = [(path, count) for path, count in sorted(path_len.items(), key=lambda d: d[0])]
     save_bz2_pickle({"node_count": len(nodes.keys()),
                      "peer_count": combined_count,
@@ -63,5 +66,6 @@ def graph_nodes(nodes, image_file_path, network_info_file_path, fig_size=(20, 20
     plt.figure(1, figsize=fig_size)
     nx.draw(g, with_labels=True)
     plt.savefig(image_file_path)
+    plt.close()
     save_network_info(g, ip_index, nodes, network_info_file_path)
     return list(ip_index.items())

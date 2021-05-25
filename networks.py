@@ -80,9 +80,14 @@ _casper_ips = ["178.238.235.196",
 
 _casper_test_ips = ["3.208.91.63", "35.169.197.193"]
 
+_integration_test_ips = ["3.140.179.157", "3.138.177.248", "3.143.158.19", "3.139.47.90", "18.219.25.234"]
+
 NETWORKS = [Network(name="casper",
                     ips=_casper_ips,
                     protocol_url="http://genesis.casperlabs.io"),
             Network(name="casper-test",
                     ips=_casper_test_ips,
-                    protocol_url="https://casper-genesis.casperlabs.io")]
+                    protocol_url="https://casper-genesis.make.services"),
+            Network(name="integration-test",
+                    ips=_integration_test_ips,
+                    protocol_url="http://genesis.casperlabs.io")]

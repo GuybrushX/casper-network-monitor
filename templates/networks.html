@@ -45,11 +45,19 @@ table th {
 
 <table border=1 style="float: left">
     <caption>Networks</caption>
-    {% for network in networks %}
     <tr>
-        <td><a href="/{{ network.name }}">{{ network.name }}</a></td>
-    </tr>
+    {% for network in networks %}
+        <th>{{ network.name }}</th>
     {% endfor %}
+    </tr><tr>
+    {% for network in networks %}
+        <td><a href="/network/{{ network.name }}/summary">summary</a></td>
+    {% endfor %}
+    </tr><tr>
+    {% for network in networks %}
+        <td><a href="/network/{{ network.name }}/detail">detail</a></td>
+    {% endfor %}
+    </tr>
 </table>
 
 </body>
