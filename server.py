@@ -45,7 +45,7 @@ def networks():
 
 @app.route('/debug_upload_script')
 def debug_upload_script():
-    return (SCRIPT_DIR / "debug_upload_script.sh").read_text()
+    return send_file(SCRIPT_DIR / "debug_upload_script.sh")
 
 
 def valid_key(key: str) -> bool:
@@ -80,14 +80,38 @@ def upload_debug_info():
     return "complete\n", 200
 
 
-@app.route('/view_debug_info/<key>/<ts>', defaults={'key': None, 'ts': None})
-@app.route('/view_debug_info/<key>/<ts>', defaults={'ts': None})
+@app.route('/view_debug_info', defaults={'key': None, 'ts': None})
+@app.route('/view_debug_info/<key>', defaults={'ts': None})
 @app.route('/view_debug_info/<key>/<ts>')
 @basic_auth.required
 def view_debug_info(key, ts):
+    if key is None and ts is None:
+        keys = sorted([path.name for path in UPLOAD_PATH.glob('*')])
+        return render_template('debug_keys.html', keys=keys)
+    if ts is None:
+        key_path = UPLOAD_PATH / key
+        timestamps = sorted([path.name for path in key_path.glob('*')])
+        return render_template('debug_timestamps.html', key=key, timestamps=timestamps)
+    full_path = UPLOAD_PATH / key / ts
+    logs = sorted([path.name for path in full_path.glob('casper-node.log*gz')])
+    err_logs = sorted([path.name for path in full_path.glob('casper-node.stderr.log*gz')])
+    configs = sorted([path.name for path in full_path.glob('*_*_*.tar.gz')])
+    reports = [path for path in full_path.glob('casper_node_report')]
+    if reports:
+        report = reports[0].read_text()
+    return render_template('debug_full.html',
+                           casper_node_report=report,
+                           logs=logs,
+                           err_logs=err_logs,
+                           configs=configs,
+                           key=key,
+                           ts=ts)
 
-    # List all keys directories
-    return f"hello {key} {ts}"
+
+@app.route('/download_debug_info/<key>/<ts>/<file>')
+@basic_auth.required
+def download_debug_info(key, ts, file):
+    return send_file(UPLOAD_PATH / key / ts / file, mimetype="application/gzip")
 
 
 @app.route('/network/<network_name>/detail')

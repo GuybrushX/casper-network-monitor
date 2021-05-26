@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set x
-
 LOG_COUNT=3
 RUN_TS=$(date +%s)
 KEY=$(cat /etc/casper/validator_keys/public_key_hex)
