@@ -3,7 +3,7 @@
 LOG_COUNT=3
 RUN_TS=$(date +%s)
 KEY=$(cat /etc/casper/validator_keys/public_key_hex)
-SERVER_NAME="http://127.0.0.1:8080"
+SERVER_NAME="https://cnm.casperlabs.io"
 
 upload () {
   echo "Uploading $1"
