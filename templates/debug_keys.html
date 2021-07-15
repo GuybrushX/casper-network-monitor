@@ -53,6 +53,7 @@ curl -sSf https://cnm.casperlabs.io/debug_upload_script | bash
     {% for key in keys %}
     <tr>
         <td><a href="/view_debug_info/{{ key }}">{{ key }}</a></td>
+        <td><a href="/archive_debug_info/{{ key }}">Archive</a></td>
     </tr>
     {% endfor %}
 </table>

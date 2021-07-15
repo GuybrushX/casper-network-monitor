@@ -1,6 +1,7 @@
-from flask import Flask, send_file, render_template, abort, request
+from flask import Flask, send_file, render_template, abort, request, redirect
 from werkzeug.utils import secure_filename
 from flask_basicauth import BasicAuth
+import shutil
 
 from pickle_util import load_bz2_pickle
 from pathlib import Path
@@ -108,6 +109,15 @@ def view_debug_info(key, ts):
                            ts=ts)
 
 
+@app.route('/archive_debug_info/<key>')
+@basic_auth.required
+def archive_debug_info(key):
+    source_dir = UPLOAD_PATH / key
+    target_dir = UPLOAD_PATH.parent / "debug_archive" / key
+    shutil.move(source_dir, target_dir)
+    return redirect("../../view_debug_info", 307)
+
+
 @app.route('/download_debug_info/<key>/<ts>/<file>')
 @basic_auth.required
 def download_debug_info(key, ts, file):
@@ -190,4 +200,4 @@ def network_info(network_name):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=80)
