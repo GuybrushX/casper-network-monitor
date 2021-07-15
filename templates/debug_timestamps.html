@@ -45,9 +45,10 @@ table th {
 
 <table border=1 style="float: left" width="90%">
     <caption>Debug Info: {{ key }}</caption>
-    {% for ts in timestamps %}
+    {% for ts, time in ts_times %}
     <tr>
         <td><a href="/view_debug_info/{{ key }}/{{ ts }}">{{ ts }}</a></td>
+        <td>{{ time }}</td>
     </tr>
     {% endfor %}
 </table>

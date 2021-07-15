@@ -62,6 +62,7 @@ table th {
     <tr>
         <td>{{ err_log }}</td>
         <td><a href="/download_debug_info/{{ key }}/{{ ts }}/{{ err_log }}">Download</a></td>
+        <td><a href="/tail_debug_logs/{{ key }}/{{ ts }}/{{ err_log }}">Tail Log</a></td>
     </tr>
     {% endfor %}
 </table>

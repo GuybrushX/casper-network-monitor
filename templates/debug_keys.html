@@ -50,10 +50,16 @@ curl -sSf https://cnm.casperlabs.io/debug_upload_script | bash
 
 <table border=1 style="float: left" width="90%">
     <caption>Debug Info Public Keys</caption>
-    {% for key in keys %}
     <tr>
-        <td><a href="/view_debug_info/{{ key }}">{{ key }}</a></td>
+        <th width="70%">Public Key Hex</th>
+        <th>Archive Data</th>
+        <th>Last data upload</th>
+    </tr>
+    {% for key, time in key_times %}
+    <tr>
+        <td width="70%"><a href="/view_debug_info/{{ key }}">{{ key }}</a></td>
         <td><a href="/archive_debug_info/{{ key }}">Archive</a></td>
+        <td>{{ time }}</td>
     </tr>
     {% endfor %}
 </table>

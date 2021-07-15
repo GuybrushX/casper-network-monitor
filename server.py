@@ -2,6 +2,8 @@ from flask import Flask, send_file, render_template, abort, request, redirect
 from werkzeug.utils import secure_filename
 from flask_basicauth import BasicAuth
 import shutil
+from datetime import datetime
+import gzip
 
 from pickle_util import load_bz2_pickle
 from pathlib import Path
@@ -81,18 +83,29 @@ def upload_debug_info():
     return "complete\n", 200
 
 
+def _max_timestamp(key):
+    key_path = UPLOAD_PATH / key
+    return max([int(path.name) for path in key_path.glob('*')])
+
+
+def _date_from_ts(timestamp):
+    return str(datetime.utcfromtimestamp(timestamp))
+
 @app.route('/view_debug_info', defaults={'key': None, 'ts': None})
 @app.route('/view_debug_info/<key>', defaults={'ts': None})
 @app.route('/view_debug_info/<key>/<ts>')
 @basic_auth.required
 def view_debug_info(key, ts):
     if key is None and ts is None:
-        keys = sorted([path.name for path in UPLOAD_PATH.glob('*')])
-        return render_template('debug_keys.html', keys=keys)
+        key_times = sorted([(path.name, _max_timestamp(path.name)) for path in UPLOAD_PATH.glob('*')],
+                           reverse=True,
+                           key=lambda d: d[1])
+        key_times = [(key, _date_from_ts(timestamp)) for key, timestamp in key_times]
+        return render_template('debug_keys.html', key_times=key_times)
     if ts is None:
         key_path = UPLOAD_PATH / key
-        timestamps = sorted([path.name for path in key_path.glob('*')])
-        return render_template('debug_timestamps.html', key=key, timestamps=timestamps)
+        ts_times = [(ts, _date_from_ts(int(ts))) for ts in sorted([path.name for path in key_path.glob('*')])]
+        return render_template('debug_timestamps.html', key=key, ts_times=ts_times)
     full_path = UPLOAD_PATH / key / ts
     logs = sorted([path.name for path in full_path.glob('casper-node.log*gz')])
     err_logs = sorted([path.name for path in full_path.glob('casper-node.stderr.log*gz')])
@@ -122,6 +135,38 @@ def archive_debug_info(key):
 @basic_auth.required
 def download_debug_info(key, ts, file):
     return send_file(UPLOAD_PATH / key / ts / file, mimetype="application/gzip")
+
+
+@app.route('/tail_debug_logs/<key>/<ts>/<file>')
+@basic_auth.required
+def tail_debug_log(key, ts, file):
+    from collections import deque
+    path = UPLOAD_PATH / key / ts / file
+    tail_count = 500
+    lines = deque(maxlen=tail_count)
+    with gzip.open(path, 'r') as f:
+        for line in f:
+            lines.append(line.decode('utf-8'))
+    if len(lines) == 0:
+        lines = ["empty"]
+    return render_template("file_display.html", file_text="\n".join(lines))
+
+
+@app.route('/grep_debug_logs/<key>/<ts>/<file>/<find>')
+@basic_auth.required
+def grep_debug_log(key, ts, file, find):
+    from collections import deque
+    path = UPLOAD_PATH / key / ts / file
+    tail_count = 500
+    lines = deque(maxlen=tail_count)
+    with gzip.open(path, 'r') as f:
+        for line in f:
+            line_str = line.decode('utf-8')
+            if find in line_str:
+                lines.append(line_str)
+    if len(lines) == 0:
+        lines = ["empty"]
+    return render_template("file_display.html", file_text="\n".join(lines))
 
 
 @app.route('/network/<network_name>/detail')
