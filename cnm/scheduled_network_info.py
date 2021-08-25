@@ -5,6 +5,7 @@ from cnm.network.peer_spider import get_network_nodes_status
 from cnm.casper_networks import CasperNetwork, network_by_name
 from cnm.data.file_spider import FileSpider
 from cnm.data.file_network_detail import FileNetworkDetail
+from cnm.data.fle_network_summary import FileNetworkSummary
 
 from cnm.config import WEB_DATA
 
@@ -112,6 +113,9 @@ class NetworkInfo:
             details["data"].append(cur_detail)
         return details
 
+    def _make_summary(self):
+        pass
+
     @property
     def last_block_time(self):
         max_height = 0
@@ -140,6 +144,9 @@ class NetworkInfo:
         self._remove_bad_ips()
         FileSpider(self.config.name, WEB_DATA, self.statuses).save()
         FileNetworkDetail(self.config.name, WEB_DATA, self._make_detail()).save()
+        FileNetworkSummary(self.config.name, WEB_DATA, self._make_summary()).save()
+
+
 
     # @staticmethod
     # def generate_network_info(network_name: str):
