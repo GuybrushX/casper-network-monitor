@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Networks</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<table border=1 style="float: left">
+    <caption>Networks</caption>
+    <tr>
+    {% for network in networks %}
+        <th>{{ network.name }}</th>
+    {% endfor %}
+    </tr><tr>
+    {% for network in networks %}
+        <td><a href="/network/{{ network.name }}/summary">summary</a></td>
+    {% endfor %}
+    </tr><tr>
+    {% for network in networks %}
+        <td><a href="/network/{{ network.name }}/detail">detail</a></td>
+    {% endfor %}
+    </tr><tr>
+    {% for network in networks %}
+        <td><a href="/network/{{ network.name }}/era_times">era times</a></td>
+    {% endfor %}
+    </tr>
+</table>
+
+</body>
+</html>

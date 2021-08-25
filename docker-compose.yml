@@ -1,0 +1,34 @@
+version: '3.7'
+services:
+  web:
+    build: .
+    ports:
+    - "80:80"
+    links:
+    - mongo
+    environment:
+    - WEB_DATA=/data/web
+    - WEB_UPLOAD_DATA=/data/upload-data
+    - WEB_UPLOAD_ARCHIVE=/data/upload-archive
+    - WEB_USER=user
+    - WEB_PASS=pass
+    volumes:
+      - web-data:/data/web
+      - web-upload-data:/data/upload-data
+      - web-upload-archive:/data/upload-archive
+#  mongo:
+#    image: mongo:5.0.1
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD: Secret
+#    ports:
+#      - "27017:27017"
+#    volumes:
+#      - mongo-data:/data/data
+#      - mongo-configdb:/data/configdb
+volumes:
+#  mongo-data:
+#  mongo-configdb:
+  web-data:
+  web-upload-data:
+  web-upload-archive:

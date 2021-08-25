@@ -8,3 +8,10 @@ sqlalchemy
 toml
 pytz
 Flask-BasicAuth
+snap-stanford
+pytest
+turbo-flask
+pymongo
+flask-pymongo
+Flask-APScheduler==1.12.2
+mongoengine

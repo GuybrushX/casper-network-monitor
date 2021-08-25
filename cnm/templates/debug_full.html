@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Info Detail</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<table border=1 style="float: left">
+    <caption>casper_node_report</caption>
+    <tr>
+        <td style="text-align: left;"><pre>{{ casper_node_report }}</pre></td>
+    </tr>
+</table>
+<table border=1 style="float: left">
+    <caption>casper-node logs</caption>
+    {% for log in logs %}
+    <tr>
+        <td>{{ log }}</td>
+        <td><a href="/download_debug_info/{{ key }}/{{ ts }}/{{ log }}">Download</a></td>
+    </tr>
+    {% endfor %}
+
+    {% for err_log in err_logs %}
+    <tr>
+        <td>{{ err_log }}</td>
+        <td><a href="/download_debug_info/{{ key }}/{{ ts }}/{{ err_log }}">Download</a></td>
+        <td><a href="/tail_debug_logs/{{ key }}/{{ ts }}/{{ err_log }}">Tail Log</a></td>
+    </tr>
+    {% endfor %}
+</table>
+<table border=1 style="float: left">
+    <caption>config files</caption>
+    {% for config in configs %}
+    <tr>
+        <td>{{ config }}</td>
+        <td><a href="/download_debug_info/{{ key }}/{{ ts }}/{{ config }}">Download</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/dataTables.responsive.css">
+</head>
+
+<body>
+  <div class ='container-fluid' style="background-color:#000000; margin-bottom: 10px;">
+    <div class = 'row'>
+      <div style='margin-left:20px;'>
+        <img src = 'https://avatars3.githubusercontent.com/u/44785362?s=400&u=14ee63c2f356cd428a22e6fd7571270fe366648f&v=4' width="200" height="200">
+      </div>
+      <div style='padding-left:20px; padding-top:75px;'>
+        <h1>
+	  <font color='red'>{{table_info|title}} {{ network_name }} node status detail</font>
+        </h1>
+      </div>
+    </div>
+  </div>
+
+  <div class='container-fluid' style='overflow: auto; height: 100%'>
+  <table id="main" class = 'table dataTable table-striped table-bordered text-center table-sm display nowrap' cellspacing="0" width="100%" style='width: 100%; height: 100%'>
+    <thead class = 'thead-dark'>
+      <tr>
+        {% for field in headers %}
+        <th>{{ field }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+
+    {% for node in nodes %}
+    <tr>
+      {% for field in node %}
+      <td>{{ field if field is not none }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </table>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#main').DataTable({
+        'paging': false,
+        //'responsive': true,
+	'stateSave': true,
+	'scroller': true,
+        'scrollY': 500,
+	'scrollX': true,
+	//'deferRender': true,
+	//'scrollCollapse': true,
+	//'overflow-x': scroll,
+        //'margin': auto,
+	//'searching': true
+      });
+    } );
+  </script>
+</body>
+</html>
+
+
+
+
+
