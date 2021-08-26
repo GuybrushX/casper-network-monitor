@@ -4,8 +4,8 @@ services:
     build: .
     ports:
     - "80:80"
-    links:
-    - mongo
+#    links:
+#    - mongo
     environment:
     - WEB_DATA=/data/web
     - WEB_UPLOAD_DATA=/data/upload-data

@@ -1,6 +1,6 @@
 from flask import Flask, send_file, render_template, abort, request, redirect
 from flask_basicauth import BasicAuth
-from flask_pymongo import PyMongo
+# from flask_pymongo import PyMongo
 from werkzeug.utils import secure_filename
 
 from pathlib import Path
@@ -30,8 +30,8 @@ app.config['BASIC_AUTH_USERNAME'] = config.WEB_USER
 app.config['BASIC_AUTH_PASSWORD'] = config.WEB_PASS
 basic_auth = BasicAuth(app)
 
-app.config["MONGO_URI"] = config.MONGO_URI
-mongo = PyMongo(app)
+# app.config["MONGO_URI"] = config.MONGO_URI
+# mongo = PyMongo(app)
 
 scheduled_tasks.start_scheduler(app)
 scheduled_tasks.start_network_tasks(NETWORKS)
