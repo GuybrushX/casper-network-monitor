@@ -74,7 +74,7 @@ def _date_from_ts(timestamp):
 
 @app.route('/debug_upload_script')
 def debug_upload_script():
-    return send_file(SCRIPT_DIR / "debug_upload_script.sh")
+    return redirect("/static/debug_upload_script.sh")
 
 
 @app.route('/upload_debug_info', methods=['POST'])

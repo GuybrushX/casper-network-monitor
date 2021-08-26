@@ -9,8 +9,8 @@ UPLOAD_ARCHIVE_PATH = Path(os.environ.get("WEB_UPLOAD_DATA", SCRIPT_DIR.parent /
 WEB_USER = os.environ.get("WEB_USER")
 WEB_PASS = os.environ.get("WEB_PASS")
 
-MONGO_USER = "root"
-MONGO_PASS = "Secret"
-MONGO_SERVER = "localhost"
-MONGO_DB = "cnm"
-MONGO_URI = f"mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_SERVER}"
+# MONGO_USER = "root"
+# MONGO_PASS = "Secret"
+# MONGO_SERVER = "localhost"
+# MONGO_DB = "cnm"
+# MONGO_URI = f"mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_SERVER}"
