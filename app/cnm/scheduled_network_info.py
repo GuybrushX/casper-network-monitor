@@ -123,9 +123,9 @@ class NetworkInfo:
         for node in nodes:
             node_count += 1
             upgrade = None
-            if node["next_upgrade"]:
-                upgrade = node["next_upgrade"]["activation_point"]
-            version = node['api_version'], upgrade
+            if node.get("next_upgrade"):
+                upgrade = node["next_upgrade"].get("activation_point")
+            version = node.get('api_version'), upgrade
             if node.get("cur_weight", 0) > 0:
                 val_count += 1
                 valid_ver[version] += 1
@@ -138,7 +138,7 @@ class NetworkInfo:
                              "all_pct": round(val / node_count * 100, 2),
                              "all_cnt": val,
                              "val_pct": round(valid_ver.get(key, 0) / val_count * 100, 2),
-                             "val_cnt": val_count,
+                             "val_cnt": valid_ver.get(key, 0),
                              "val_wgt_pct": round(weight_pct.get(key, 0), 2)})
         return versions
 
@@ -186,51 +186,17 @@ class NetworkInfo:
         # If you don't strip errors out, getting TypeError: cannot pickle 'module' object
         # Even converting to string this is happening.  Odd.  Was trying to save errors and strip before detail.
         self._remove_bad_ips()
-        FileSpider(self.config.name, WEB_DATA, self.statuses).save()
+        try:
+            FileSpider(self.config.name, WEB_DATA, self.statuses.copy()).save()
+        except Exception as e:
+            print(e)
         FileNetworkDetail(self.config.name, WEB_DATA, self._make_detail()).save()
         tip_status = list(self._near_tip_status(3))
         summary = {"full": self._make_summary(self.statuses.values()),
                    "top": self._make_summary(tip_status),
                    "full_links": self._make_links(self.statuses.values()),
                    "top_links": self._make_links(tip_status)}
-
-
-    # @staticmethod
-    # def generate_network_info(network_name: str):
-    #     """
-    #     Slow method that spiders network and saves data for network detail, summary and other pages.
-    #     """
-    #     net_config: CasperNetwork = network_by_name(network_name)
-    #     nodes_status = get_network_nodes_status(network_name, net_config.ips)
-    #     auction_info = get_auction_info(net_config.rpc_url)
-    #
-    #     key_bids = {bid["public_key"]: bid["bid"] for bid in auction_info["auction_state"]["bids"]}
-    #     era_vals = auction_info["auction_state"]["era_validators"]
-    #     cur_key_weights, cur_total_weight = _era_key_weights(era_vals[0]["validator_weights"])
-    #     next_key_weights, next_total_weight = _era_key_weights(era_vals[1]["validator_weights"])
-    #     error_node_ips = []
-    #     for ip, node in nodes_status.items():
-    #         if node.get("error", False):
-    #             error_node_ips.append(ip)
-    #             continue
-    #         key = node.get("our_public_signing_key", None)
-    #         node["cur_weight"] = cur_key_weights.get(key, 0)
-    #         try:
-    #             node["cur_percent"] = node["cur_weight"] / cur_total_weight
-    #         except ZeroDivisionError:
-    #             pass
-    #         node["next_weight"] = next_key_weights.get(key, 0)
-    #         try:
-    #             node["next_percent"] = node["next_weight"] / next_total_weight
-    #         except ZeroDivisionError:
-    #             pass
-    #         bid = key_bids.get(key)
-    #         if bid is None:
-    #             continue
-    #         node["staked_amount"] = bid.get("staked_amount")
-    #         node["delegation_rate"] = bid.get("delegation_rate")
-    #         node["inactive"] = bid.get("inactive")
-    #     FileSpider(network_name, config.WEB_DATA, nodes_status).save()
+        FileNetworkSummary(self.config.name, WEB_DATA, summary).save()
 
 
 def generate_network_info(scheduler, network_config):

@@ -7,54 +7,60 @@
 </head>
 <body>
 
-<table border=1 style="float: left">
-    <caption>Node Peer Counts</caption>
-    <tr>
-        <th>Peer Count</th>
-        <th>One Way</th>
-        <th>Two Way</th>
-    </tr>
-    {% for pc in peer_counts %}
-    <tr>
-        <td>{{ pc[0] }}</td>
-        <td>{{ pc[1] }}</td>
-        <td>{{ pc[2] }}</td>
-    </tr>
-    {% endfor %}
-</table>
-
-<table border=1 style="float: left">
-    <caption>Node Paths</caption>
-    <tr>
-        <th>Path Len</th>
-        <th>Count</th>
-    </tr>
-    {% for path, count in path_counts %}
-        <tr>
-            <td>{{ path }}</td>
-            <td>{{ count }}</td>
-        </tr>
-    {% endfor %}
-</table>
+{#<table border=1 style="float: left">#}
+{#    <caption>Node Peer Counts</caption>#}
+{#    <tr>#}
+{#        <th>Peer Count</th>#}
+{#        <th>One Way</th>#}
+{#        <th>Two Way</th>#}
+{#    </tr>#}
+{#    {% for pc in peer_counts %}#}
+{#    <tr>#}
+{#        <td>{{ pc[0] }}</td>#}
+{#        <td>{{ pc[1] }}</td>#}
+{#        <td>{{ pc[2] }}</td>#}
+{#    </tr>#}
+{#    {% endfor %}#}
+{#</table>#}
+{##}
+{#<table border=1 style="float: left">#}
+{#    <caption>Node Paths</caption>#}
+{#    <tr>#}
+{#        <th>Path Len</th>#}
+{#        <th>Count</th>#}
+{#    </tr>#}
+{#    {% for path, count in path_counts %}#}
+{#        <tr>#}
+{#            <td>{{ path }}</td>#}
+{#            <td>{{ count }}</td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
+{#</table>#}
 
 <table border=1 style="float: left">
     <caption>Version Status</caption>
     <tr>
         <th>Version</th>
-        <th>Validator Nodes*</th>
-        <th>Validator Wgt*</th>
-        <th>All Nodes*</th>
+        <th>Upgrade</th>
+        <th>Val Nodes Cnt</th>
+        <th>Val Nodes</th>
+        <th>Val Weight</th>
+        <th>All Nodes Cnt</th>
+        <th>All Nodes</th>
     </tr>
     {% for version in versions %}
     <tr>
-        <td>{{ version["version"] }}</td>
-        <td>{{ version["val_node_pct"] }}%</td>
+        <td>{{ version["version"][0] }}</td>
+        <td>{{ version["version"][1] }}</td>
+        <td>{{ version["val_cnt"] }}</td>
+        <td>{{ version["val_pct"] }}%</td>
         <td>{{ version["val_wgt_pct"] }}%</td>
-        <td>{{ version["all_node_pct"] }}%</td>
+        <td>{{ version["all_cnt"] }}</td>
+        <td>{{ version["all_pct"] }}%</td>
     </tr>
     {% endfor %}
 </table>
-<p>* Not all open ports for status.</p>
-<img alt="Network graph" src="./img" width="60%" style="float: left"/>
+{#<p>* Not all open ports for status.</p>#}
+{#<img alt="Network graph" src="./img" width="60%" style="float: left"/>#}
 </body>
 </html>

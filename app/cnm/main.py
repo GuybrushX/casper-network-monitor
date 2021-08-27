@@ -43,8 +43,8 @@ def networks():
 
 
 app.add_url_rule('/network/<network_name>/detail', view_func=network_pages.network_detail)
-# app.add_url_rule('/network/<network_name>/summary', view_func=network_pages.network_summary)
-app.add_url_rule('/network/<network_name>/img', view_func=network_pages.get_network_image)
+app.add_url_rule('/network/<network_name>/summary', view_func=network_pages.network_summary)
+# app.add_url_rule('/network/<network_name>/img', view_func=network_pages.get_network_image)
 app.add_url_rule('/network/<network_name>/era_times', view_func=era_times.list_era_times)
 app.add_url_rule('/network/<network_name>/era_times/<eras>', view_func=era_times.list_era_times)
 
@@ -130,6 +130,7 @@ def view_debug_info(key, ts):
                            configs=configs,
                            key=key,
                            ts=ts)
+
 
 @app.route('/archive_debug_info/<key>')
 @basic_auth.required
