@@ -1,13 +1,14 @@
-from datetime import datetime
+from time import time
+from collections import defaultdict
 
-from cnm.network.node_rpc import get_auction_info
-from cnm.network.peer_spider import get_network_nodes_status
-from cnm.casper_networks import CasperNetwork, network_by_name
-from cnm.data.file_spider import FileSpider
-from cnm.data.file_network_detail import FileNetworkDetail
-from cnm.data.fle_network_summary import FileNetworkSummary
+from .network.node_rpc import get_auction_info
+from .network.peer_spider import get_network_nodes_status
+from .casper_networks import CasperNetwork, network_by_name
+from .data.file_spider import FileSpider
+from .data.file_network_detail import FileNetworkDetail
+from .data.file_network_summary import FileNetworkSummary
 
-from cnm.config import WEB_DATA
+from .config import WEB_DATA
 
 
 class NetworkInfo:
@@ -113,8 +114,33 @@ class NetworkInfo:
             details["data"].append(cur_detail)
         return details
 
-    def _make_summary(self):
-        pass
+    def _make_summary(self, nodes):
+        valid_ver = defaultdict(int)
+        weight_pct = defaultdict(int)
+        all_ver = defaultdict(int)
+        node_count = 0
+        val_count = 0
+        for node in nodes:
+            node_count += 1
+            upgrade = None
+            if node["next_upgrade"]:
+                upgrade = node["next_upgrade"]["activation_point"]
+            version = node['api_version'], upgrade
+            if node.get("cur_weight", 0) > 0:
+                val_count += 1
+                valid_ver[version] += 1
+            weight_pct[version] += node.get("cur_percent", 0)
+            all_ver[version] += 1
+
+        versions = []
+        for key, val in all_ver.items():
+            versions.append({"version": key,
+                             "all_pct": round(val / node_count * 100, 2),
+                             "all_cnt": val,
+                             "val_pct": round(valid_ver.get(key, 0) / val_count * 100, 2),
+                             "val_cnt": val_count,
+                             "val_wgt_pct": round(weight_pct.get(key, 0), 2)})
+        return versions
 
     @property
     def last_block_time(self):
@@ -131,6 +157,24 @@ class NetworkInfo:
 
         return
 
+    def _make_links(self, statuses):
+        pass
+
+    def _near_tip_status(self, blocks_off_max: int):
+        max_height = 0
+        for status in self.statuses.values():
+            labi = status.get("last_added_block_info")
+            if labi is None:
+                continue
+            max_height = max(max_height, labi.get("height", 0))
+        must_be_height = max_height - blocks_off_max
+        for status in self.statuses.values():
+            labi = status.get("last_added_block_info")
+            if labi is None:
+                continue
+            if labi.get("height", 0) >= must_be_height:
+                yield status
+
     def generate(self):
         """
         Slow method that spiders network and saves data for network detail, summary and other pages.
@@ -144,8 +188,11 @@ class NetworkInfo:
         self._remove_bad_ips()
         FileSpider(self.config.name, WEB_DATA, self.statuses).save()
         FileNetworkDetail(self.config.name, WEB_DATA, self._make_detail()).save()
-        FileNetworkSummary(self.config.name, WEB_DATA, self._make_summary()).save()
-
+        tip_status = list(self._near_tip_status(3))
+        summary = {"full": self._make_summary(self.statuses.values()),
+                   "top": self._make_summary(tip_status),
+                   "full_links": self._make_links(self.statuses.values()),
+                   "top_links": self._make_links(tip_status)}
 
 
     # @staticmethod
@@ -188,12 +235,13 @@ class NetworkInfo:
 
 def generate_network_info(scheduler, network_config):
     print(f"Started: Generating info for network {network_config.name}.")
+    start = time()
     ni = NetworkInfo(network_config)
     ni.generate()
     # look for a mid block time and schedule for next run
     # check for "fast mode".
-    print(f"Finished: Generating info for network {network_config.name}.")
-
+    elapsed = round(time() - start, 1)
+    print(f"Finished: Generating info for network {network_config.name}.  Runtime: {elapsed} secs.")
 
 
 if __name__ == "__main__":

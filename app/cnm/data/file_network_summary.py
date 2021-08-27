@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from cnm.data.abstract_network_summary import AbstractNetworkSummary
+from .abstract_network_summary import AbstractNetworkSummary
 
 
 class FileNetworkSummary(AbstractNetworkSummary):

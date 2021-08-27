@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from cnm.data.abstract_network_detail import AbstractNetworkDetail
-from cnm.data.pickle_util import save_bz2_pickle, load_bz2_pickle
-from cnm.data.file_utils import assure_dir_exists
+from .abstract_network_detail import AbstractNetworkDetail
+from .pickle_util import save_bz2_pickle, load_bz2_pickle
+from .file_utils import assure_dir_exists
 
 
 class FileNetworkDetail(AbstractNetworkDetail):
