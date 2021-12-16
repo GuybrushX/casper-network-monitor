@@ -29,6 +29,7 @@
         <th>Public Key</th>
         <th>Peer Count</th>
         <th>Round Length</th>
+        <th>Uptime</th>
         <th>Era ID</th>
         <th>Block Height</th>
         <th>Block TimeStamp</th>
@@ -48,6 +49,7 @@
       <td>{{ node["our_public_signing_key"] }}</td>
       <td>{{ node["two_way_peers"] | length }}</td>
       <td>{{ node["round_length"] }}</td>
+      <td>{{ node["uptime"] }}</td>
       <td>{{ node["last_added_block_info"]["era_id"] if node["last_added_block_info"] is not none }}</td>
       <td>{{ node["last_added_block_info"]["height"] if node["last_added_block_info"] is not none }}</td>
       <td>{{ node["last_added_block_info"]["timestamp"] if node["last_added_block_info"] is not none }}</td>
